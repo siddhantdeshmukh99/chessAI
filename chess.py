@@ -585,6 +585,20 @@ class State:
                         else: 
                             if self.mat[cord[0]][cord[1]+1].split(" ")[0]!=self.side:
                                 possible_move_perpiece.append([cord[0],cord[1]+1])
+                    count=0
+                    if self.side == "white":
+                            for cord in self.pieces["white"]["rook"]:
+                                if cord not in [[0,0],[0,7]]:
+                                    count=count+1
+                    if count==2:
+                        self.castle=False
+                    count=0
+                    if self.side == "black":
+                            for cord in self.pieces["black"]["rook"]:
+                                if cord not in [[7,0],[7,7]]:
+                                    count=count+1
+                    if count==2:
+                        self.castle=False
                     if self.castle:
                         if self.side == "white":
                             i=cord[0]
@@ -649,12 +663,12 @@ class State:
                             #right rook    
                             i=cord[0]
                             castle=True
-                            while i<=cord[0]+2 and castle:
-                                if self.mat[i][j]!="" and self.mat[i][j]!="white king":
+                            while i<=cord[0]+2:
+                                if self.mat[i][j]!=""  and self.mat[i][j]!="white king":
                                     castle=False
                                     break
-                                a=i
-                                b=j
+                                a=i+1
+                                b=j+1
                                 while a<8 and b<8:
                                     if self.mat[a][b]!="" and self.mat[a][b].split(" ")[0]!=self.side and self.mat[a][b].split(" ")[1] in ["queen","bishop"]:
                                         castle=False
@@ -665,8 +679,8 @@ class State:
                                     b=b+1
                                 if not castle:
                                     break
-                                a=i
-                                b=j
+                                a=i-1
+                                b=j+1
                                 while a>=0 and b<8:
                                     if self.mat[a][b]!="" and self.mat[a][b].split(" ")[0]!=self.side and self.mat[a][b].split(" ")[1] in ["queen","bishop"]:
                                         castle=False
@@ -678,7 +692,7 @@ class State:
                                 if not castle:
                                     break
                                 a=i
-                                b=j
+                                b=j+1
                                 while b<8:
                                     if self.mat[a][b]!="" and self.mat[a][b].split(" ")[0]!=self.side and self.mat[a][b].split(" ")[1] in ["queen","rook"]:
                                         castle=False
@@ -713,8 +727,8 @@ class State:
                                 if self.mat[i][j]!="" and self.mat[i][j]!="black king":
                                     castle=False
                                     break
-                                a=i
-                                b=j
+                                a=i-1
+                                b=j-1
                                 while a>=0 and b>=0:
                                     if self.mat[a][b]!="" and self.mat[a][b].split(" ")[0]!=self.side and self.mat[a][b].split(" ")[1] in ["queen","bishop"]:
                                         castle=False
@@ -725,8 +739,8 @@ class State:
                                     b=b-1
                                 if not castle:
                                     break
-                                a=i
-                                b=j
+                                a=i+1
+                                b=j-1
                                 while a<8 and b>=0:
                                     if self.mat[a][b]!="" and self.mat[a][b].split(" ")[0]!=self.side and self.mat[a][b].split(" ")[1] in ["queen","bishop"]:
                                         castle=False
@@ -738,7 +752,7 @@ class State:
                                 if not castle:
                                     break
                                 a=i
-                                b=j
+                                b=j-1
                                 while b>=0:
                                     if self.mat[a][b]!="" and self.mat[a][b].split(" ")[0]!=self.side and self.mat[a][b].split(" ")[1] in ["queen","rook"]:
                                         castle=False
@@ -772,8 +786,8 @@ class State:
                                 if self.mat[i][j]!="" and self.mat[i][j]!="black king":
                                     castle=False
                                     break
-                                a=i
-                                b=j
+                                a=i-1
+                                b=j-1
                                 while a>=0 and b>=0:
                                     if self.mat[a][b]!="" and self.mat[a][b].split(" ")[0]!=self.side and self.mat[a][b].split(" ")[1] in ["queen","bishop"]:
                                         castle=False
@@ -784,8 +798,8 @@ class State:
                                     b=b-1
                                 if not castle:
                                     break
-                                a=i
-                                b=j
+                                a=i+1
+                                b=j-1
                                 while a<8 and b>=0:
                                     if self.mat[a][b]!="" and self.mat[a][b].split(" ")[0]!=self.side and self.mat[a][b].split(" ")[1] in ["queen","bishop"]:
                                         castle=False
@@ -797,7 +811,7 @@ class State:
                                 if not castle:
                                     break
                                 a=i
-                                b=j
+                                b=j-1
                                 while b>=0:
                                     if self.mat[a][b]!="" and self.mat[a][b].split(" ")[0]!=self.side and self.mat[a][b].split(" ")[1] in ["queen","rook"]:
                                         castle=False
@@ -952,7 +966,7 @@ class AI:
                         
 if __name__ == "__main__":
     #side = input("Which side do you want to play from?")
-    side="black"
+    side="white"
     if side == "black" or side=="Black":
         b=Board("white","black")
     else:
@@ -982,7 +996,3 @@ if __name__ == "__main__":
                     if b.checkMate():
                         print("checkMate")
                         break
-                    print(b.currentState.castle)
-                    
-
-
