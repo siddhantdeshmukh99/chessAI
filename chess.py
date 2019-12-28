@@ -650,7 +650,7 @@ class State:
                             i=cord[0]
                             castle=True
                             while i<=cord[0]+2 and castle:
-                                if self.mat[i][j]!="":
+                                if self.mat[i][j]!="" and self.mat[i][j]!="white king":
                                     castle=False
                                     break
                                 a=i
@@ -769,7 +769,7 @@ class State:
                             i=cord[0]
                             castle=True
                             while i<=cord[0]+2:
-                                if self.mat[i][j]!="":
+                                if self.mat[i][j]!="" and self.mat[i][j]!="black king":
                                     castle=False
                                     break
                                 a=i
