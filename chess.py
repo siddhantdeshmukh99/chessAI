@@ -597,8 +597,6 @@ class State:
                             for cord in self.pieces["black"]["rook"]:
                                 if cord not in [[7,0],[7,7]]:
                                     count=count+1
-                    if count==2:
-                        self.castle=False
                     if self.castle:
                         if self.side == "white":
                             i=cord[0]
@@ -847,9 +845,9 @@ class State:
                                     possible_move_perpiece.append([cord[0],cord[1]+2])
                         elif cord[1]+1<8 and self.mat[cord[0]][cord[1]+1]=="":
                                 possible_move_perpiece.append([cord[0],cord[1]+1])
-                        if cord[0]+1<8 and self.mat[cord[0]+1][cord[1]+1]!="" and self.mat[cord[0]+1][cord[1]+1].split(" ")[0]!=self.side:
+                        if cord[0]+1<8 and cord[1]+1<8 and self.mat[cord[0]+1][cord[1]+1]!="" and self.mat[cord[0]+1][cord[1]+1].split(" ")[0]!=self.side:
                             possible_move_perpiece.append([cord[0]+1,cord[1]+1])
-                        if cord[0]-1>=0 and self.mat[cord[0]-1][cord[1]+1]!="" and self.mat[cord[0]-1][cord[1]+1].split(" ")[0]!=self.side:
+                        if cord[0]-1>=0 and cord[1]+1<8 and self.mat[cord[0]-1][cord[1]+1]!="" and self.mat[cord[0]-1][cord[1]+1].split(" ")[0]!=self.side:
                             possible_move_perpiece.append([cord[0]-1,cord[1]+1])
                     elif self.side=="black":
                         if cord[1]==6:
@@ -902,6 +900,7 @@ class AI:
         self.depth=depth
         self.alphaSide=""
     def alphaBeta(self,currentState,alpha,beta,depth):
+        global totalNodesSearched
         if depth==self.depth:
             white,black=currentState.getStateScore()
             if self.alphaSide=="white":
@@ -965,8 +964,7 @@ class AI:
         return movePiece,moveInitialCord,moveFinalCord
                         
 if __name__ == "__main__":
-    #side = input("Which side do you want to play from?")
-    side="white"
+    side = input("Which side do you want to play from?")
     if side == "black" or side=="Black":
         b=Board("white","black")
     else:
