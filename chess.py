@@ -39,7 +39,7 @@ class State:
         self.pieceSquareTable["rook"]=[[0,-5,-5,-5,-5,-5,5,0],[0,0,0,0,0,0,10,0],[0,0,0,0,0,0,10,0],[5,0,0,0,0,0,10,0],[5,0,0,0,0,0,10,0],[0,0,0,0,0,0,10,0],[0,0,0,0,0,0,10,0],[0,-5,-5,-5,-5,-5,5,0]]
         self.pieceSquareTable["queen"]=[[-20,-10,-10,0,-5,-10,-10,-20],[-10,0,5,0,0,0,0,-10],[-10,5,5,5,5,5,0,-10],[-5,0,5,5,5,5,0,-5],[-5,0,5,5,5,5,0,-5],[-10,0,5,5,5,5,0,-10],[-10,0,0,0,0,0,0,-10],[-20,-10,-10,-5,-5,-10,-10,-20]]
         self.pieceSquareTable["king"]=[]
-        self.pieceSquareTable["king"].append([[20,20,-10,-20,-30,-30,-30,-30],[30,20,-20,-30,-40,-40,-40,-40],[15,0,-20,-30,-40,-40,-40,-40],[0,0,-20,-40,-50,-50,-50,-50],[0,0,-20,-40,-50,-50,-50,-50],[10,0,-20,-30,-40,-40,-40,-40],[30,20,-20,-30,-40,-40,-40,-40],[20,20,-10,-20,-30,-30,-30,-30]])
+        self.pieceSquareTable["king"].append([[20,20,-10,-20,-30,-30,-30,-30],[30,20,-20,-30,-40,-40,-40,-40],[20,0,-20,-30,-40,-40,-40,-40],[0,0,-20,-40,-50,-50,-50,-50],[0,0,-20,-40,-50,-50,-50,-50],[10,0,-20,-30,-40,-40,-40,-40],[35,20,-20,-30,-40,-40,-40,-40],[20,20,-10,-20,-30,-30,-30,-30]])
         self.pieceSquareTable["king"].append([[-50,-30,-30,-30,-30,-30,-30,-50],[-30,-30,-10,-10,-10,-10,-20,-40],[-30,0,20,30,30,20,-10,-30],[-30,0,30,40,40,30,0,-20],[-30,0,30,40,40,30,0,-20],[-30,0,20,30,30,20,-10,-30],[-30,-30,-10,-10,-10,-10,-20,-40],[-50,-30,-30,-30,-30,-30,-30,-50]])
     def getStateScore(self):
         scoreWhite=0
@@ -587,16 +587,18 @@ class State:
                                 possible_move_perpiece.append([cord[0],cord[1]+1])
                     count=0
                     if self.side == "white":
-                            for cord in self.pieces["white"]["rook"]:
-                                if cord not in [[0,0],[0,7]]:
+                            for cord1 in self.pieces["white"]["rook"]:
+                                if cord1 not in [[0,0],[0,7]]:
                                     count=count+1
                     if count==2:
                         self.castle=False
                     count=0
                     if self.side == "black":
-                            for cord in self.pieces["black"]["rook"]:
-                                if cord not in [[7,0],[7,7]]:
+                            for cord1 in self.pieces["black"]["rook"]:
+                                if cord1 not in [[0,7],[7,7]]:
                                     count=count+1
+                    if count==2:
+                        self.castle=False
                     if self.castle:
                         if self.side == "white":
                             i=cord[0]
@@ -901,7 +903,7 @@ class AI:
         self.alphaSide=""
     def alphaBeta(self,currentState,alpha,beta,depth):
         global totalNodesSearched
-        if depth==self.depth:
+        if depth>=self.depth:
             white,black=currentState.getStateScore()
             if self.alphaSide=="white":
                 return white
@@ -917,8 +919,12 @@ class AI:
                             castle,pieces=currentState.getNextState(piece,currentState.pieces[currentState.side][piece][cordIndex],final_cord)
                             if currentState.side=="white":
                                 newState=State(castle,pieces,"black")
+                                if len(newState.pieces["white"]["king"])==0:
+                                    return 200000
                             else:
                                 newState=State(castle,pieces,"white")
+                                if len(newState.pieces["black"]["king"])==0:
+                                    return 200000
                             alpha=max(self.alphaBeta(newState,alpha,beta,depth+1),alpha)
                             if alpha>=beta :
                                 return beta
@@ -934,6 +940,8 @@ class AI:
                                 newState=State(castle,newPieces,"black")
                             else:
                                 newState=State(castle,newPieces,"white")
+                            if len(newState.pieces[self.alphaSide]["king"])==0:
+                                return -200000
                             beta=min(self.alphaBeta(newState,alpha,beta,depth+1),beta)
                             if alpha>=beta :
                                 return alpha
@@ -994,3 +1002,7 @@ if __name__ == "__main__":
                     if b.checkMate():
                         print("checkMate")
                         break
+
+    
+
+
