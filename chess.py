@@ -35,7 +35,7 @@ class State:
         self.pieceSquareTable={}
         self.pieceSquareTable["pawn"]=[[0,5,5,0,5,10,50,0],[0,10,-5,0,5,10,50,0],[0,10,-10,0,10,20,50,0],[0,-20,0,20,25,30,50,0],[0,-20,0,20,25,30,50,0],[0,10,-10,0,10,20,50,0],[0,10,-5,0,5,10,50,0],[0,5,5,0,5,10,50,0]]
         self.pieceSquareTable["knight"]=[[-50,-40,-30,-30,-30,-30,-40,-50],[-40,-20,5,0,5,0,-20,-40],[-30,0,10,15,15,10,0,-30],[-30,5,15,20,20,15,0,-30],[-30,5,15,20,20,15,0,-30],[-30,0,10,15,15,10,0,-30],[-40,-20,5,0,5,0,-20,-40],[-50,-40,-30,-30,-30,-30,-40,-50]]
-        self.pieceSquareTable["bishop"]=[[-20,-10,-10,-10,-10,-10,-10,-20],[-10,5,10,0,5,0,0,-10],[-10,0,10,10,5,5,0,-10],[-10,0,10,10,10,10,0,-10],[-10,0,10,10,10,10,0,-10],[-10,0,10,10,5,5,0,-10],[-10,5,10,0,5,0,0,-10],[-20,-10,-10,-10,-10,-10,-10,-20]]
+        self.pieceSquareTable["bishop"]=[[-20,-10,-10,-10,-10,-10,-10,-20],[-10,5,10,0,10,0,0,-10],[-10,0,10,10,5,5,0,-10],[-10,0,10,10,10,10,0,-10],[-10,0,10,10,10,10,0,-10],[-10,0,10,10,5,5,0,-10],[-10,5,10,0,10,0,0,-10],[-20,-10,-10,-10,-10,-10,-10,-20]]
         self.pieceSquareTable["rook"]=[[0,-5,-5,-5,-5,-5,5,0],[0,0,0,0,0,0,10,0],[0,0,0,0,0,0,10,0],[5,0,0,0,0,0,10,0],[5,0,0,0,0,0,10,0],[0,0,0,0,0,0,10,0],[0,0,0,0,0,0,10,0],[0,-5,-5,-5,-5,-5,5,0]]
         self.pieceSquareTable["queen"]=[[-20,-10,-10,0,-5,-10,-10,-20],[-10,0,5,0,0,0,0,-10],[-10,5,5,5,5,5,0,-10],[-5,0,5,5,5,5,0,-5],[-5,0,5,5,5,5,0,-5],[-10,0,5,5,5,5,0,-10],[-10,0,0,0,0,0,0,-10],[-20,-10,-10,-5,-5,-10,-10,-20]]
         self.pieceSquareTable["king"]=[]
@@ -80,7 +80,7 @@ class State:
                         if piece!="king":
                             pieceSquareTableScoreBlack=pieceSquareTableScoreBlack+self.pieceSquareTable[piece][cord[0]][7-cord[1]]
                         elif len(self.pieces["white"]["queen"])==0 or len(self.pieces["black"]["rook"])+len(self.pieces["black"]["bishop"])+len(self.pieces["black"]["knight"])<1:
-                                pieceSquareTableScoreBlack=pieceSquareTableScoreBlack+self.pieceSquareTable[piece][1][cord[0]][7-cord[1]]
+                                pieceSquareTableScoreBlack=pieceSquareTableScoreBlack+self.pieceSquareTable[piece][1][7-cord[0]][7-cord[1]]
         scoreWhite=scoreWhite+pieceSquareTableScoreWhite
         scoreBlack=scoreBlack+pieceSquareTableScoreBlack
         #pawn structure
@@ -919,11 +919,11 @@ class AI:
                             castle,pieces=currentState.getNextState(piece,currentState.pieces[currentState.side][piece][cordIndex],final_cord)
                             if currentState.side=="white":
                                 newState=State(castle,pieces,"black")
-                                if len(newState.pieces["white"]["king"])==0:
+                                if len(newState.pieces["black"]["king"])==0:
                                     return 200000
                             else:
                                 newState=State(castle,pieces,"white")
-                                if len(newState.pieces["black"]["king"])==0:
+                                if len(newState.pieces["white"]["king"])==0:
                                     return 200000
                             alpha=max(self.alphaBeta(newState,alpha,beta,depth+1),alpha)
                             if alpha>=beta :
@@ -942,7 +942,10 @@ class AI:
                                 newState=State(castle,newPieces,"white")
                             if len(newState.pieces[self.alphaSide]["king"])==0:
                                 return -200000
-                            beta=min(self.alphaBeta(newState,alpha,beta,depth+1),beta)
+                            if currentState.mat[final_cord[0]][final_cord[1]]!="" and depth==self.depth-1:
+                                beta=min(self.alphaBeta(newState,alpha,beta,depth),beta)
+                            else:
+                                beta=min(self.alphaBeta(newState,alpha,beta,depth+1),beta)
                             if alpha>=beta :
                                 return alpha
                 return beta  
@@ -963,7 +966,7 @@ class AI:
                         newState=State(castle,newPieces,"white")
                     x=self.alphaBeta(newState,alpha,beta,0)
                     print(alphaState.side,piece,alphaState.pieces[alphaState.side][piece][cordIndex],final_cord,x)
-                    if value<x:
+                    if value<=x:
                         value=x
                         movePiece=piece
                         moveInitialCord=alphaState.pieces[alphaState.side][piece][cordIndex]
@@ -972,6 +975,12 @@ class AI:
         return movePiece,moveInitialCord,moveFinalCord
                         
 if __name__ == "__main__":
+    """black={"rook":[[0,7],[7,7]],"knight":[],"king":[[4,7]],"bishop":[[5,7]],"queen":[],"pawn":[[i,6] for i in range(8)]}
+    white={"rook":[[0,0],[7,0]],"knight":[],"king":[[4,0]],"bishop":[[2,0]],"queen":[[3,0]],"pawn":[[i,1] for i in range(8)]}
+    pieces={"white":white,"black":black}
+    test=State(True,pieces,"black").getLeagleMoves()
+    for x in test:
+      print(x,test[x])"""
     side = input("Which side do you want to play from?")
     if side == "black" or side=="Black":
         b=Board("white","black")
